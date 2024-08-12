@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Explorer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Product Explorer</h1>
+            <p class="subtitle">Discover products from our backend API</p>
+        </header>
+        <main>
+            <input type="text" id="searchInput" placeholder="Search for products..." oninput="filterProducts()">
+            <div id="productList" class="product-list">
+                <p>Loading products...</p>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2024 Product Explorer. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        let products = [];
+
+        function fetchProducts() {
+            fetch('http://localhost:5000/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    products = data.products;
+                    displayProducts(products);
+                })
+                .catch(error => console.error('Error fetching products:', error));
+        }
+
+        function displayProducts(products) {
+            const productList = document.getElementById('productList');
+            if (products.length === 0) {
+                productList.innerHTML = '<p>No products found.</p>';
+            } else {
+                productList.innerHTML = products.map(product => `
+                    <div class="product-item">
+                        <h3>${product.name}</h3>
+                        <p>Price: $${product.price.toFixed(2)}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(query)
+            );
+            displayProducts(filteredProducts);
+        }
+
+        // Fetch products on initial load
+        fetchProducts();
+    </script>
+</body>
+</html>
